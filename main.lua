@@ -299,10 +299,10 @@ function Lib:CreateWindow( index )
 
     --// Display Window //--
     local TrimmedWinName = Win.Name;
-    if dx9.CalcTextWidth(TrimmedWinName) >=  540 then
+    if dx9.CalcTextWidth(TrimmedWinName) >=  280 then
         repeat
             TrimmedWinName = TrimmedWinName:sub(1,-2)
-        until dx9.CalcTextWidth(TrimmedWinName) <= 540
+        until dx9.CalcTextWidth(TrimmedWinName) <= 280
     end
 
     function Win:Render()
