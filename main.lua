@@ -1,8 +1,6 @@
 --// supgLib DX9Ware Mini UI //--
 
 --[[
-version 1.00
-
 ADD SUPPORT FOR ROUNDING ( for now it only supports 0 )
 
 ADD INPUT PROTECTION ( for keybinds and more )
@@ -10,8 +8,6 @@ ADD INPUT PROTECTION ( for keybinds and more )
 Gav was here
 
 ADD COLOR PICKER FUNCTION THAT GETS INDEX OF 1 - 205 FOR BOTH BAR 1 AND 2 BRUH
-
-ss
 ]]
 
 
@@ -964,7 +960,7 @@ function Lib:CreateWindow( index )
 
                 --// Draw Slider in Groupbox
                 if Win.CurrentTab ~= nil and Win.CurrentTab == Tab.Name and Lib.Active and Groupbox.Visible and (Groupbox.Root[2] + 55 + Groupbox.ToolSpacing) < Win.Location[2] + Win.Size[2] - 24 then
-                    local temp = math.floor( Slider.Value )..Slider.Suffix.."/"..params.Max..Slider.Suffix
+                    local temp = Slider.Value..Slider.Suffix.."/"..params.Max..Slider.Suffix
                     local bar_length = 235
 
                     local val = ( 1 / ( ( params.Max - params.Min ) / (Slider.Value - params.Min) )  )
@@ -1018,7 +1014,7 @@ function Lib:CreateWindow( index )
                             local val = 1 / ( bar_length/cursor )
                             if val >= .98 then val = 1 end
                             if val <= .02 then val = 0 end
-                            Slider.Value = (val * ( params.Max - params.Min )) + params.Min
+                            Slider.Value = math.floor(((val * ( params.Max - params.Min )) + params.Min) + 0.5)
                             
                             Slider.Changed = true;
                         else
