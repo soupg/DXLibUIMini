@@ -151,10 +151,10 @@ end
 if _G.Lib == nil then
     _G.Lib = { 
         FontColor = { 255 , 255 , 255 }; -- Static + [Changeable]
-        MainColor = { 28 , 28 , 28 }; -- Static + [Changeable]
-        BackgroundColor = { 20 , 20 , 20 }; -- Static + [Changeable]
-        AccentColor = { 0 , 85 , 255 }; -- Static + [Changeable]
-        OutlineColor = { 50 , 50 , 50 }; -- Static + [Changeable]
+        MainColor = { 25 , 25 , 25 }; -- Static + [Changeable]
+        BackgroundColor = { 15 , 15 , 15 }; -- Static + [Changeable]
+        AccentColor = { 255 , 50 , 255 }; -- Static + [Changeable]
+        OutlineColor = { 40 , 40 , 40 }; -- Static + [Changeable]
         Black = { 0 , 0 , 0 }; -- Static
 
         RainbowHue = 0; -- Dynamic
@@ -178,6 +178,9 @@ if _G.Lib == nil then
          };
 
         Windows = {};
+  
+        --// Dragging
+        Dragging = false;
      };
 end
 local Lib = _G.Lib
@@ -268,9 +271,12 @@ function Lib:CreateWindow( index )
     if dx9.isLeftClickHeld() and Lib.Active then
 
         --// Drag Func
-        if mouse_in_boundary( { Win.Location[1] - 5 , Win.Location[2] - 10 } , { Win.Location[1] + Win.Size[1] + 5 , Win.Location[2] + 30 } ) then
+        if Lib.Dragging or mouse_in_boundary( { Win.Location[1] - 5 , Win.Location[2] - 10 } , { Win.Location[1] + Win.Size[1] + 5 , Win.Location[2] + 30 } ) then
             if Lib.FocusedWindow == nil or Lib.FocusedWindow == Win.ID then
                 Lib.FocusedWindow = Win.ID
+    
+                if not Lib.Dragging then Lib.Dragging = true end 
+    
                 if Win.WinMouseOffset == nil then
                     Win.WinMouseOffset = { dx9.GetMouse().x - Win.Location[1] , dx9.GetMouse().y - Win.Location[2] }
                 end
@@ -283,12 +289,12 @@ function Lib:CreateWindow( index )
                     Lib.FocusedWindow = nil
                 end
             end
-        end
-        
-        --// Tab Click Func
-        for _ , t in next , Win.Tabs do
-            if mouse_in_boundary( { t.Boundary[1] , t.Boundary[2] } , { t.Boundary[3] , t.Boundary[4] } ) then
-                Win.CurrentTab = t.Name;
+        else
+            --// Tab Click Func
+            for _ , t in next , Win.Tabs do
+                if mouse_in_boundary( { t.Boundary[1] , t.Boundary[2] } , { t.Boundary[3] , t.Boundary[4] } ) and not Lib.Dragging then
+                    Win.CurrentTab = t.Name;
+                end
             end
         end
     else
@@ -519,7 +525,7 @@ function Lib:CreateWindow( index )
                         Groupbox.ToolSpacing = Groupbox.ToolSpacing + (7 + (18 * n))
 
                         --// Click Detect
-                        if mouse_in_boundary( { Button.Boundary[1] , Button.Boundary[2] } , { Button.Boundary[3] , Button.Boundary[4] }, Win.DeadZone ) then
+                        if mouse_in_boundary( { Button.Boundary[1] , Button.Boundary[2] } , { Button.Boundary[3] , Button.Boundary[4] }, Win.DeadZone ) and not Lib.Dragging then
                             --// Click Detection
                             if dx9.isLeftClickHeld() then
                                 Button.Holding = true;
@@ -688,7 +694,7 @@ function Lib:CreateWindow( index )
 
                                 FirstBarHue = FirstBarHue + 7.5
 
-                                if dx9.isLeftClickHeld() and mouse_in_boundary({ Groupbox.Root[1] + 12 + i , Groupbox.Root[2] + 51 + Picker.AddonY}, { Groupbox.Root[1] + 217 + i , Groupbox.Root[2] + 69 + Picker.AddonY }) then
+                                if dx9.isLeftClickHeld() and not Lib.Dragging and mouse_in_boundary({ Groupbox.Root[1] + 12 + i , Groupbox.Root[2] + 51 + Picker.AddonY}, { Groupbox.Root[1] + 217 + i , Groupbox.Root[2] + 69 + Picker.AddonY }) then
                                     if i < 5 then 
                                         Picker.StoredIndex2 = 1 
                                     elseif i > 200 then 
@@ -726,7 +732,7 @@ function Lib:CreateWindow( index )
                                 if Color[2] > 255 then Color[2] = 255 end
                                 if Color[3] > 255 then Color[3] = 255 end
 
-                                if dx9.isLeftClickHeld() and mouse_in_boundary({ Groupbox.Root[1] + 12 + i, Groupbox.Root[2] + 51 + 25 + Picker.AddonY }, { Groupbox.Root[1] + 217 + i, Groupbox.Root[2] + 69 + 25 + Picker.AddonY }) then
+                                if dx9.isLeftClickHeld() and not Lib.Dragging and mouse_in_boundary({ Groupbox.Root[1] + 12 + i, Groupbox.Root[2] + 51 + 25 + Picker.AddonY }, { Groupbox.Root[1] + 217 + i, Groupbox.Root[2] + 69 + 25 + Picker.AddonY }) then
                                     if i < 5 then 
                                         Picker.StoredIndex = 1 
                                     elseif i >= 66 and i <= 72 then
@@ -760,7 +766,7 @@ function Lib:CreateWindow( index )
                     Groupbox.ToolSpacing = Groupbox.ToolSpacing + 25
 
                     --// Click Detect
-                    if mouse_in_boundary( { Picker.Boundary[1] , Picker.Boundary[2] } , { Picker.Boundary[3] , Picker.Boundary[4] }, Win.DeadZone ) then
+                    if mouse_in_boundary( { Picker.Boundary[1] , Picker.Boundary[2] } , { Picker.Boundary[3] , Picker.Boundary[4] }, Win.DeadZone ) and not Lib.Dragging then
                         --// Click Detection
                         if dx9.isLeftClickHeld() then
                             Picker.Holding = true;
@@ -1000,7 +1006,7 @@ function Lib:CreateWindow( index )
                     Groupbox.ToolSpacing = Groupbox.ToolSpacing + 40
 
                     --// Hovering
-                    if mouse_in_boundary( { Slider.Boundary[1] , Slider.Boundary[2] } , { Slider.Boundary[3] , Slider.Boundary[4] }, Win.DeadZone ) then
+                    if mouse_in_boundary( { Slider.Boundary[1] , Slider.Boundary[2] } , { Slider.Boundary[3] , Slider.Boundary[4] }, Win.DeadZone ) and not Lib.Dragging then
                         --// Click Detection
                         if dx9.isLeftClickHeld() then
                             Slider.Holding = true;
@@ -1119,7 +1125,7 @@ function Lib:CreateWindow( index )
 
                     
                     --// Click Detect Toggle
-                    if mouse_in_boundary( { Toggle.Boundary[1] , Toggle.Boundary[2] } , { Toggle.Boundary[3] , Toggle.Boundary[4] }, Win.DeadZone ) then
+                    if mouse_in_boundary( { Toggle.Boundary[1] , Toggle.Boundary[2] } , { Toggle.Boundary[3] , Toggle.Boundary[4] }, Win.DeadZone ) and not Lib.Dragging then
                         --// Click Detection
                         if dx9.isLeftClickHeld() then
                             Toggle.Holding = true;
@@ -1198,13 +1204,13 @@ end
 function Lib:SetWatermark( text )
     Lib.Watermark.Text = text;
 
-    local textwidth = dx9.CalcTextWidth( text ) + 10
+    local textwidth = dx9.CalcTextWidth( text.." | UI Toggle: "..Lib.Keybind ) + 10
 
     --// Watermark Dragging
     if dx9.isLeftClickHeld() then
 
         --// Drag Func
-        if mouse_in_boundary( { Lib.Watermark.Location[1] , Lib.Watermark.Location[2] } , { Lib.Watermark.Location[1] + textwidth + 2 , Lib.Watermark.Location[2] + 23 } ) then
+        if mouse_in_boundary( { Lib.Watermark.Location[1] , Lib.Watermark.Location[2] } , { Lib.Watermark.Location[1] + textwidth + 2 , Lib.Watermark.Location[2] + 23 } ) and not Lib.Dragging then
             
             if Lib.Watermark.MouseOffset == nil then
                 Lib.Watermark.MouseOffset = { dx9.GetMouse().x - Lib.Watermark.Location[1] , dx9.GetMouse().y - Lib.Watermark.Location[2] }
@@ -1217,13 +1223,13 @@ function Lib:SetWatermark( text )
     end
 
     if Lib.Watermark.Visible then
-        local textwidth = dx9.CalcTextWidth( Lib.Watermark.Text ) + 10
+        local textwidth = dx9.CalcTextWidth( Lib.Watermark.Text.." | UI Toggle: "..Lib.Keybind ) + 10
     
         dx9.DrawFilledBox( { Lib.Watermark.Location[1] , Lib.Watermark.Location[2] } , { Lib.Watermark.Location[1] + textwidth + 2 , Lib.Watermark.Location[2] + 23 } , Lib.Black )
         dx9.DrawFilledBox( { Lib.Watermark.Location[1] + 1 , Lib.Watermark.Location[2] + 1 } , { Lib.Watermark.Location[1] + textwidth + 1 , Lib.Watermark.Location[2] + 22 } , Lib.CurrentRainbowColor )
         dx9.DrawFilledBox( { Lib.Watermark.Location[1] + 2 , Lib.Watermark.Location[2] + 2 } , { Lib.Watermark.Location[1] + textwidth , Lib.Watermark.Location[2] + 21 } , Lib.MainColor )
     
-        dx9.DrawString( { Lib.Watermark.Location[1] + 2 , Lib.Watermark.Location[2] + 1 } , Lib.FontColor , " "..Lib.Watermark.Text ) 
+        dx9.DrawString( { Lib.Watermark.Location[1] + 2 , Lib.Watermark.Location[2] + 1 } , Lib.FontColor , " "..Lib.Watermark.Text.." | UI Toggle: "..Lib.Keybind ) 
     end
 end
 
@@ -1250,3 +1256,6 @@ do
         Lib.CurrentRainbowColor = {255, 0, 1530 - Lib.RainbowHue}
     end
 end
+
+--// Final Statements
+return Lib
